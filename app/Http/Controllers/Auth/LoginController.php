@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -12,18 +13,40 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request)
+
+
+    public function login_submit(Request $request)
     {
-        $this->validate($request, [
-           'email' => 'required|email',
-           'password' => 'required'
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
-        if (!auth()->attempt($request->only('email', 'password'), $request->remember)) {
-            return back()->with('status', 'Invalid login details');
-        }
 
-        // return redirect()->intended('/');
-        return view('auth.profile');
+        $credential = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
+
+        if(Auth::guard('admin')->attempt($credential)) {
+
+            return redirect()->route('home');
+            
+            // return redirect()->route('home', ['username' => Auth::guard('admin')->user()->username]);
+
+            // return redirect()->route('home', ['username' => Auth::guard('admin')->user()->username]);
+
+        } else {
+             return redirect()->route('login')->with('error', 'Information is not correct');
+        }
     }
+
+    Public function logout()
+    {
+        Auth::guard('admin')->logout();
+        return redirect()->route('login');
+    }
+
+
+
 }
