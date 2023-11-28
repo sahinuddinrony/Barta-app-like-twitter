@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    {{-- gihub change --}}
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -261,9 +263,12 @@
                                         {{ $post->author_name }}
                                     </a> --}}
 
-                                    <a href="{{ route('view_single_profile', ['id' => $post->user_id]) }}" class="font-semibold">
-                                        <span class="hover:underline text-gray-900 flex flex-col min-w-0 flex-1">{{ $post->author_name }}</span>
-                                        <span class=" text-sm text-gray-500 line-clamp-1">{{ '@' . $post->single_name }}</span>
+                                    <a href="{{ route('view_single_profile', ['id' => $post->user_id]) }}"
+                                        class="font-semibold">
+                                        <span
+                                            class="hover:underline text-gray-900 flex flex-col min-w-0 flex-1">{{ $post->author_name }}</span>
+                                        <span
+                                            class=" text-sm text-gray-500 line-clamp-1">{{ '@' . $post->single_name }}</span>
                                     </a>
 
                                     {{-- <a href="profile.html" class="hover:underline text-sm text-gray-500 line-clamp-1">
