@@ -30,12 +30,8 @@
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-<<<<<<< HEAD
-            <form class="space-y-6" action="{{ route('login_submit') }}" method="POST">
-=======
             {{-- <form class="space-y-6" action="{{ route('login_submit') }}" method="POST"> --}}
             <form class="space-y-6" action="{{ route('login') }}" method="POST">
->>>>>>> c401750 (Initial commit for assignment-3)
                 @csrf
 
                 <div>

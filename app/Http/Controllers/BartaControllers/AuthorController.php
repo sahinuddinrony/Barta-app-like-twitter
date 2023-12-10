@@ -6,6 +6,9 @@ namespace App\Http\Controllers\BartaControllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Post;
+use App\Models\Comment;
 
 class AuthorController extends Controller
 {
@@ -13,34 +16,24 @@ class AuthorController extends Controller
 
     public function viewSingleProfile($id)
     {
-
         // Retrieve a specific user's data
-        $userData = DB::table('users')
-            ->where('id', $id)
-            ->first();
+        $userData = User::find($id);
 
-        // Retrieve the user's posts
-        $userPosts = DB::table('posts')
+        if (!$userData) {
+            // Handle case where user is not found
+            return redirect()->route('home')->with('error', 'User not found.');
+        }
+
+        // Retrieve the user's posts with comments count
+        $userPosts = Post::withCount('comments')
             ->where('user_id', $id)
-            ->orderBy('created_at', 'desc') // Order by most recent
+            ->orderByDesc('created_at')
             ->get();
 
-            // Fetch the user's comments
-            $userComments = DB::table('comments')
-                ->where('user_id', $id)
-                ->orderBy('created_at', 'desc') // Order by most recent
-                ->get();
-
-
-
-            foreach ($userPosts as $post) {
-                $commentsCount = DB::table('comments')
-                    ->where('post_id', $post->id)
-                    ->count();
-
-                // Attach the comments count to the post object
-                $post->comments_count = $commentsCount;
-            }
+        // Retrieve the user's comments
+        $userComments = Comment::where('user_id', $id)
+            ->orderByDesc('created_at')
+            ->get();
 
         return view('barta.pages.profile.view_single_profile', compact('userData', 'userPosts', 'id', 'userComments'));
     }

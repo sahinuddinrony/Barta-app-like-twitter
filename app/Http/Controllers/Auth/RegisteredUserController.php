@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
             // 'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = DB::table('users')->insert([
+        $user = User::create([
             'name' => $request->name,
             'lastname' => $request->lastname,
             'username' => $request->username,

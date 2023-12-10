@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Post extends Model implements HasMedia
+class Comment extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
     // protected $fillable = [
     //     'user_id',
-    //     'description',
+    //     'post_id',
+    //     'comment',
     // ];
 
     protected $guarded = [];
@@ -23,8 +24,8 @@ class Post extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
-    public function comments()
+    public function post()
     {
-        return $this->hasMany(Comment::class);
+        return $this->belongsTo(Post::class);
     }
 }
