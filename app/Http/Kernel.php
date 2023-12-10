@@ -2,10 +2,6 @@
 
 namespace App\Http;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> c401750 (Initial commit for assignment-3)
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel

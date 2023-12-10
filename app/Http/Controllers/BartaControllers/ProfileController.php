@@ -6,6 +6,7 @@ namespace App\Http\Controllers\BartaControllers;
 use Auth;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -22,36 +23,48 @@ class ProfileController extends Controller
 
     public function profile_submit(Request $request)
     {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'lastname' => 'nullable|string|max:255',
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'bio' => 'nullable|string',
+            'password' => 'nullable|min:8',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validation for the image
+        ]);
+
+        // Update basic user data
         $userData = [
-            'name' => $request->name ?? null,
-            'lastname' => $request->lastname ?? null,
-            'email' => $request->email ?? null,
-            'bio' => $request->bio ?? null,
+            'name' => $request->input('name'),
+            'lastname' => $request->input('lastname'),
+            'email' => $request->input('email'),
+            'bio' => $request->input('bio'),
         ];
 
         // Only add password if it is provided
         if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'required',
-                // 'retype_password' => 'required|same:password'
-            ]);
-
-            $userData['password'] = Hash::make($request->password);
+            $userData['password'] = Hash::make($request->input('password'));
         }
+        // Update user data
+        $user->update($userData);
 
-        // $email = auth()->guard('admin')->user()->email;
-        $email = auth()->user()->email;
+        // dd($request->hasFile('image'));
 
-        // Check if the user with the provided email exists
-        $userExists = DB::table('users')->where('email', $email)->exists();
+        // Handle image update
+        if ($request->hasFile('image')) {
+            // Clear/Remove existing media
+            $user->clearMediaCollection();
 
-        if ($userExists) {
-            // If the user exists, update the data
-            DB::table('users')->where('email', $email)->update($userData);
-        } else {
-            // If the user doesn't exist, insert the new data
-            $userData['email'] = $email;
-            DB::table('users')->insert($userData);
+            // Add new media
+            $image = $request->file('image');
+            $user->addMedia($image)
+            ->toMediaCollection(); // Add new media
         }
 
         return redirect()->back()->with('success', 'Profile information saved successfully');

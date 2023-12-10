@@ -4,10 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-<<<<<<< HEAD
-=======
 use Database\Seeders\PostSeeder;
->>>>>>> c401750 (Initial commit for assignment-3)
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,9 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-<<<<<<< HEAD
-        // \App\Models\User::factory(10)->create();
-=======
 
         $this->call([
             // UserSeeder::class,
@@ -28,7 +22,6 @@ class DatabaseSeeder extends Seeder
 
 
         // \App\Models\User::factory(2)->create();
->>>>>>> c401750 (Initial commit for assignment-3)
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

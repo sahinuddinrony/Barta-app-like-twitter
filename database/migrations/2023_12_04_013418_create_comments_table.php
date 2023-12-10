@@ -16,8 +16,8 @@ return new class extends Migration
             $table->uuid('uuid')->unique()->nullable();
             $table->text('comment');
             $table->unsignedBigInteger('view_count')->default(0);
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('post_id')->constrained();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

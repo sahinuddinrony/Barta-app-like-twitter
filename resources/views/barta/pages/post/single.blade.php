@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('view_sigle_post')
@@ -17,6 +16,11 @@
                             <!--                    src="https://avatars.githubusercontent.com/u/61485238"-->
                             <!--                    alt="Al Nahian" />-->
                             <!--                </div>-->
+
+                            <div class="py-4 text-gray-700 font-normal space-y-2">
+                                <img src="{{ $post->user->getFirstMediaUrl() }}" alt="{{ $post->user->name }}"
+                                    class="h-10 w-10 rounded-full object-cover" alt="">
+                            </div>
                             <!-- /User Avatar -->
 
                             <!-- User Info -->
@@ -29,8 +33,9 @@
                                 <a href="{{ route('view_single_profile', ['id' => $post->user_id]) }}"
                                     class="font-semibold">
                                     <span
-                                        class="hover:underline text-gray-900 flex flex-col min-w-0 flex-1">{{ $post->author_name }}</span>
-                                    <span class=" text-sm text-gray-500 line-clamp-1">{{ '@' . $post->single_name }}</span>
+                                        class="hover:underline text-gray-900 flex flex-col min-w-0 flex-1">{{ $post->user->name }}</span>
+                                    <span
+                                        class=" text-sm text-gray-500 line-clamp-1">{{ '@' . $post->user->username }}</span>
                                 </a>
 
 
@@ -99,16 +104,25 @@
 
                 <div class="py-4 text-gray-700 font-normal">
                     <p>
-                        {{ $post->description }}
-                        <br />
+                    <div class="py-4 text-gray-700 font-normal space-y-2">
+                        @if ($post->getFirstMediaUrl())
+                            <img src="{{ $post->getFirstMediaUrl() }}" alt=""
+                                class="min-h-auto w-full rounded-lg object-cover max-h-64 md:max-h-72" />
+                        @endif
+                        {{-- <p>Beautiful 😍😘 Innit?</p> --}}
+                    </div>
 
-                        <a href="#laravel" class="text-black font-semibold hover:underline">#Laravel</a>
-                        <br />
-                        <br />
+                    {{ $post->description }}
+                    <br />
+
+                    <a href="#laravel" class="text-black font-semibold hover:underline">#Laravel</a>
+                    <br />
+                    <br />
                     <p><a href="{{ route('home') }}">Back to Home Feed</a></p>
                     {{-- <p><a href="{{ route('home', ['username' => $post->single_name]) }}">Back to Home Feed</a></p> --}}
                     </p>
                 </div>
+
 
                 <!-- Date Created & View Stat -->
                 <div class="flex items-center gap-2 text-gray-500 text-xs my-2">
@@ -138,7 +152,7 @@
                             <!-- User Avatar -->
                             <div class="flex-shrink-0">
                                 <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://avatars.githubusercontent.com/u/831997" alt="Ahmed Shamim" />
+                                    src="{{ auth()->user()->getFirstMediaUrl() }}" alt="Ahmed Shamim" />
                             </div>
                             <!-- /User Avatar -->
 
@@ -281,19 +295,20 @@
                                         <!-- User Avatar -->
                                         <div class="flex-shrink-0">
                                             <img class="h-10 w-10 rounded-full object-cover"
-                                                src="https://avatars.githubusercontent.com/u/61485238" alt="Al Nahian" />
+                                                src="{{ $comment->user->getFirstMediaUrl() }}"
+                                                alt="{{ $comment->user->name }}" />
                                         </div>
                                         <!-- /User Avatar -->
                                         <!-- User Info -->
                                         <div class="text-gray-900 flex flex-col min-w-0 flex-1">
                                             <a href="profile.html" class="hover:underline font-semibold line-clamp-1">
-                                                {{ $comment->user_name }}
+                                                {{ $comment->user->name }}
                                                 {{-- {{ $post->author_name }} --}}
                                             </a>
 
                                             <a href="profile.html"
                                                 class="hover:underline text-sm text-gray-500 line-clamp-1">
-                                                {{ '@' . $comment->user_username }}
+                                                {{ '@' . $comment->user->username }}
                                             </a>
                                         </div>
                                         <!-- /User Info -->

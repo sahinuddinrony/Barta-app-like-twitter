@@ -6,22 +6,28 @@
         <!-- Cover Container -->
         <section
             class="bg-white border-2 p-8 border-gray-800 rounded-xl min-h-[350px] space-y-8 flex items-center flex-col justify-center">
+
             <!-- Profile Info -->
             <div class="flex gap-4 justify-center flex-col text-center items-center">
                 <!-- User Meta -->
-                <div>
+                <div class="flex gap-4 justify-center flex-col text-center items-center">
 
-                    {{-- @if (auth()->check())
-            <h1 class="font-bold md:text-2xl">{{ auth()->user()->name }}</h1>
-        @else
-            <p>User not authenticated</p>
-        @endif --}}
+                    <!-- Avatar -->
+                    <div class="relative">
+                        <img class="w-32 h-32 rounded-full border-2 border-gray-800"
+                            src="{{ auth()->user()->getFirstMediaUrl() }}" alt="{{ auth()->user()->name }}" />
+                        <!--            <span class="bottom-2 right-4 absolute w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>-->
+                    </div>
+                    <!-- /Avatar -->
 
-                    <h1 class="font-bold md:text-2xl">{{ auth()->user()->name }}</h1>
-                    <p class="text-gray-700">{{ '@' . $userData->username }}</p>
-                    <br>
-                    {{-- {{ auth()->user()->name }} --}}
-                    <p class="text-gray-700">{{ $userData->bio }}</p>
+                    <!-- User Meta -->
+                    <div>
+                        <h1 class="font-bold md:text-2xl">{{ $user->name }}</h1>
+                        <p class="text-gray-700">{{ '@' . $user->username }}</p>
+                        <br>
+                        <p class="text-gray-700">{{ $user->bio }}</p>
+                    </div>
+                    <!-- / User Meta -->
                 </div>
                 <!-- / User Meta -->
             </div>
@@ -41,28 +47,11 @@
                     <p class="text-gray-600">Comments</p>
                 </div>
 
-                <!-- কমেন্ট বাটনে লিঙ্ক দিয়ে নেক্সট পেজ নিচের কোড ব্যবহারশো করা যাই   -->
-
-                {{-- @foreach ($userComments as $comment)
-                <li><h2>{{ $comment->comment }}</h2></li>
-                        @endforeach --}}
-
-                {{-- @foreach ($userPosts as $post)
-                    <div>
-                        <!-- Your other post-related content here -->
-
-                        <div class="flex flex-col justify-center items-center">
-                            <h4 class="sm:text-xl font-bold">{{ $post->comments_count }}</h4>
-                            <p class="text-gray-600">Comments</p>
-                        </div>
-                    </div>
-                @endforeach --}}
-
                 <!-- Joined Date -->
                 <div class="flex flex-col justify-center items-center">
-                    @if ($userData->created_at)
+                    @if ($user->created_at)
                         <h4 class="sm:text-xl font-bold">
-                            {{ \Carbon\Carbon::parse($userData->created_at)->format('F Y') }}</h4>
+                            {{ \Carbon\Carbon::parse($user->created_at)->format('F Y') }}</h4>
                         <p class="text-gray-600">Joined</p>
                     @else
                         <p class="text-gray-600">Joined N/A</p>
@@ -95,6 +84,28 @@
             <!-- Create Post Card Top -->
             <div>
                 <div class="flex items-start /space-x-3/">
+
+                    <!-- User Avatar -->
+                    {{-- <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="{{ auth()->user()->getFirstMediaUrl() }}" alt="{{ auth()->user()->name }}" />
+            </div> --}}
+
+                    <div class="flex-shrink-0">
+                        @if (auth()->user()->getMedia()->isNotEmpty())
+                            <img class="h-10 w-10 rounded-full object-cover" src="{{ auth()->user()->getFirstMediaUrl() }}"
+                                alt="{{ auth()->user()->name }}" />
+                        @else
+                            <div
+                                class="h-10 w-10 flex items-center justify-center bg-gray-300 text-gray-600 rounded-full font-semibold">
+                                {{ substr(auth()->user()->name, 0, 1) . substr(auth()->user()->lastname, 0, 1) }}
+                            </div>
+                        @endif
+                    </div>
+
+
+
+                    <!-- /User Avatar -->
+
                     <!-- Content -->
 
                     <input type="hidden" name="user_id" value="{{ auth()->id() }}">
@@ -131,19 +142,29 @@
                 @foreach ($userPosts as $post)
                     <!-- User Specific Posts Feed -->
                     <!-- Barta Card -->
-                    <article
-                        class="bg-white border-2 border-black rounded-lg shadow mx-auto max-w-none px-4 py-5 sm:px-6">
+                    <article class="bg-white border-2 border-black rounded-lg shadow mx-auto max-w-none px-4 py-5 sm:px-6">
                         <!-- Barta Card Top -->
                         <header>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <!-- User Avatar -->
-                                    <!--                <div class="flex-shrink-0">-->
-                                    <!--                  <img-->
-                                    <!--                    class="h-10 w-10 rounded-full object-cover"-->
-                                    <!--                    src="https://avatars.githubusercontent.com/u/831997"-->
-                                    <!--                    alt="Tony Stark" />-->
-                                    <!--                </div>-->
+
+
+                                    <div class="flex-shrink-0">
+                                        @if (auth()->user()->getMedia()->isNotEmpty())
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="{{ auth()->user()->getFirstMediaUrl() }}"
+                                                alt="{{ auth()->user()->name }}" />
+                                        @else
+                                            <div
+                                                class="h-10 w-10 flex items-center justify-center bg-gray-300 text-gray-600 rounded-full font-semibold">
+                                                {{ substr(auth()->user()->name, 0, 1) . substr(auth()->user()->lastname, 0, 1) }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+
+
                                     <!-- /User Avatar -->
 
                                     <!-- User Info -->
@@ -179,8 +200,8 @@
                                         <!-- Dropdown menu -->
                                         <div x-show="open" @click.away="open = false"
                                             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                            role="menu" aria-orientation="vertical"
-                                            aria-labelledby="user-menu-button" tabindex="-1">
+                                            role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
+                                            tabindex="-1">
                                             <a href="{{ route('edit_post', ['postId' => $post->uuid]) }}"
                                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 role="menuitem" tabindex="-1" id="user-menu-item-0">Edit</a>
@@ -194,13 +215,6 @@
                             </div>
                         </header>
 
-                        <!-- Content -->
-
-
-
-                        {{-- @if (count($userPosts) > 0)
-    <ul>
-        @foreach ($userPosts as $post) --}}
                         <li>
                             <h2>{{ $post->description }}</h2>
 
@@ -231,14 +245,47 @@
                                         </svg>
 
                                         {{-- <p>3 fack</p> --}}
+                                        <p>{{ count($post->comments) }}</p>
 
-                                        <p>
+                                        {{-- <p>
                                             @if ($post->comments_count > 0)
-                                                {{ $post->comments_count }} {{ $post->comments_count == 1 ? 'comment' : 'comments' }}
+                                                {{ $post->comments_count }}
+                                                {{ $post->comments_count == 1 ? 'comment' : 'comments' }}
                                             @else
                                                 No comments
                                             @endif
-                                        </p>
+                                        </p> --}}
+
+
+                                        {{-- <!-- Comment Section allcomment  -->
+                                        <div class="mt-4">
+                                            @if ($post->comments->isNotEmpty())
+                                                <p class="text-gray-700 font-bold">Comments:</p>
+                                                <ul>
+                                                    @foreach ($post->comments as $comment)
+                                                        <li class="flex items-center gap-2 text-gray-500 text-xs">
+                                                            <span>{{ $comment->user->name }}:</span>
+                                                            <span>{{ $comment->comment }}</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <p class="text-gray-700">No comments</p>
+                                            @endif
+                                        </div>
+                                        <!-- /Comment Section --> --}}
+
+
+
+
+                                        {{-- <p>
+                                            @if ($post->comments_count > 0)
+                                                {{ $post->comments_count }} {{ Str::plural('comment', $post->comments_count) }}
+                                            @else
+                                                No comments
+                                            @endif
+                                        </p> --}}
+
 
                                         {{-- <p>{{ $post->comments_count }} {{ $post->comments_count == 1 ? 'comment' : 'comments' }}</p> --}}
 
@@ -259,8 +306,6 @@
             <p>No posts found.</p>
         @endif
 
-
-
     </main>
 
-    @endsection
+@endsection

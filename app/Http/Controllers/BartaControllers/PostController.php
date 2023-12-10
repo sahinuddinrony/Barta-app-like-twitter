@@ -1,11 +1,11 @@
 <?php
 
-// namespace App\Http\Controllers\Auth;
 namespace App\Http\Controllers\BartaControllers;
 
+use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,69 +13,48 @@ class PostController extends Controller
 {
     public function createPost(Request $request)
     {
-        // Validate request data
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'description' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Add image validation rules
         ]);
 
-        // Assuming you have a form with a user_id input
         $userId = $request->input('user_id');
         $description = $request->input('description');
 
-        // Insert the new post into the database
-        DB::table('posts')->insert([
+        $post = Post::create([
             'user_id' => $userId,
             'uuid' => Str::uuid(),
             'description' => $description,
-            'view_count' => 0, // Initialize view count to zero
-            'created_at' => now(),
-            'updated_at' => now(),
+            'view_count' => 0,
         ]);
 
-        return redirect()->route('home'); // Assuming you have a route named 'home'
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $post->addMedia($image)
+            // ->usingName('Barta Spatia')
+            // ->toMediaCollection('barta');
+            ->toMediaCollection();
+        }
 
-        // return redirect()->route('home', ['username' => auth()->user()->username]);
+        return redirect()->route('home');
     }
-
-
 
     public function viewSinglePost($postId)
     {
-        // Fetch single post and increment view count
-        $post = DB::table('posts')
-            ->join('users', 'posts.user_id', '=', 'users.id')
-            ->select('posts.*', 'users.name as author_name', 'users.username as single_name')
-            ->where('posts.uuid', $postId)
+        $post = Post::with(['user', 'comments', 'comments.user'])
+            ->where('uuid', $postId)
             ->first();
 
         if ($post) {
-            // Increment view count
-            DB::table('posts')
-                ->where('id', $post->id)
-                ->increment('view_count');
+            $post->increment('view_count');
 
-            // Fetch total count of comments and comment data with user information
-            $commentsCount = DB::table('comments')
-                ->where('post_id', $post->id)
-                ->count();
-
-            $commentData = DB::table('comments')
+            $commentsCount = $post->comments->count();
+            $commentData = $post->comments()
                 ->select('comment', 'view_count', 'user_id', 'created_at', 'uuid')
-                ->where('post_id', $post->id)
-                ->orderBy('created_at', 'desc') // Order by most recent
+                ->orderByDesc('created_at')
                 ->get();
-
-            // Fetch user information for each comment
-            foreach ($commentData as $comment) {
-                $user = DB::table('users')
-                    ->select('name', 'username') // Add other user fields if needed
-                    ->where('id', $comment->user_id)
-                    ->first();
-
-                $comment->user_name = $user->name;
-                $comment->user_username = $user->username;
-            }
 
             return view('barta.pages.post.single', compact('post', 'commentsCount', 'commentData'));
         } else {
@@ -83,21 +62,12 @@ class PostController extends Controller
         }
     }
 
-
     public function editPost($postId)
     {
-        // Fetch single post
-        // $post = DB::table('posts')->where('id', $postId)->first();
+        $post = Post::where('uuid', $postId)->first();
 
-        $post = DB::table('posts')
-            ->join('users', 'posts.user_id', '=', 'users.id')
-            ->select('posts.*', 'users.name as author_name', 'users.username as single_name')
-            ->where('posts.uuid', $postId)
-            ->first();
-
-        // Check if the post exists
         if ($post) {
-            // You can implement authorization logic here to ensure only the author can edit the post
+            // Implement authorization logic here if needed
 
             return view('barta.pages.post.edit', compact('post'));
         } else {
@@ -107,49 +77,60 @@ class PostController extends Controller
 
     public function updatePost(Request $request, $postId)
     {
-        $updateDescription = ['description' => $request->description ?? null];
-
-        // Validate request data
         $request->validate([
             'description' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust the validation rules for the image
         ]);
 
-        // Update post
-        DB::table('posts')
-            ->where('posts.uuid', $postId)
-            ->update($updateDescription);
-        // ->update(['description' => $request->input('description')]);
+        $post = Post::where('uuid', $postId)->first();
 
-        return redirect()->route('home')->with('success', 'Post updated successfully!');
+        if ($post) {
+            // Implement authorization logic here if needed
 
-        // return redirect()->route('home', ['username' => auth()->user()->username]);
+            $post->update(['description' => $request->input('description')]);
+
+           // Handle image update
+        if ($request->hasFile('image')) {
+            $post->clearMediaCollection(); // Remove existing media
+
+            // Assuming you want to add the image to a media collection named 'images'
+            $image = $request->file('image');
+            $post->addMedia($image)
+                 ->toMediaCollection(); // Add new media
+
+            // dd($post);
+        }
+
+            return redirect()->route('home')->with('success', 'Post updated successfully!');
+        }
+        else {
+            return redirect()->route('home')->with('error', 'Post not found.');
+        }
     }
 
     public function deletePost($postId)
     {
+        $post = Post::where('uuid', $postId)->first();
 
-        // Fetch single post
-        $post = DB::table('posts')->where('posts.uuid', $postId)->first();
-
-        // Check if the post exists
         if ($post) {
-            // You can implement authorization logic here to ensure only the author can delete the post
+            // Implement authorization logic here if needed
 
-            // Delete post
-            DB::table('posts')->where('posts.uuid', $postId)->delete();
+            // Remove media associated with the post
+            $post->clearMediaCollection();
+
+            // Delete the post
+            $post->delete();
 
             return redirect()->route('home')->with('success', 'Post deleted successfully!');
-
-            // return redirect()->route('home', ['username' => auth()->user()->username]);
         } else {
             return redirect()->route('home')->with('error', 'Post not found.');
         }
     }
 
+
     public function showAllPosts()
     {
-        // Fetch all posts
-        $posts = DB::table('posts')->get();
+        $posts = Post::all();
 
         return view('posts.home', compact('posts'));
     }
