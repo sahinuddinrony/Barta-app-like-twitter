@@ -20,6 +20,7 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+<<<<<<< HEAD
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
@@ -27,6 +28,28 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+=======
+        // return [
+        //     'name' => fake()->name(),
+        //     'email' => fake()->unique()->safeEmail(),
+        //     'email_verified_at' => now(),
+        //     'password' => static::$password ??= Hash::make('password'),
+        //     'remember_token' => Str::random(10),
+        // ];
+
+        return [
+            'name' => $this->faker->firstName,
+            'lastname' => $this->faker->lastName,
+            'username' => $this->faker->unique()->userName,
+            'email' => $this->faker->unique()->safeEmail,
+            'password' => Hash::make('password'), // You may want to use bcrypt('password') instead
+            'bio' => $this->faker->paragraph,
+            'email_verified_at' => now(),
+            'remember_token' => Str::random(10),
+        ];
+
+
+>>>>>>> c401750 (Initial commit for assignment-3)
     }
 
     /**

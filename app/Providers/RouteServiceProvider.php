@@ -17,6 +17,11 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
+<<<<<<< HEAD
+=======
+    // public const HOME = '/dashboard';
+    // public const HOME = 'barta.pages.home';
+>>>>>>> c401750 (Initial commit for assignment-3)
     public const HOME = '/home';
 
     /**
